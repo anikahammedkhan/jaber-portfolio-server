@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 // Database connection
+// Database connection
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri, {
   serverApi: {
