@@ -22,12 +22,8 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-
-async function run() {
-  try {
-    // Connect to the database
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
+client.connect();
+client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     // Set up collections
@@ -317,23 +313,10 @@ async function run() {
     });
 
 
-
-    // connection test 
     app.get('/', async (req, res) => {
         res.send('Jaber Portfolio Server is running');
     });
 
     app.listen(port, () => {
-      console.log(`Jaber Portfolio Server is running on PORT: ${port}`);
+        console.log(`Jaber Portfolio Server is running on PORT: ${port}`);
     });
-  } catch (err) {
-    console.log(err);
-  } finally {
-    // await client.close();
-  }
-}
-
-
-run().catch(console.log);
-
-module.exports = app;
