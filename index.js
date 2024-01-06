@@ -62,8 +62,9 @@ client.db("admin").command({ ping: 1 });
 
 
 
-    app.post('/blog', async (req, res) => {
-      const { title, subtitle, link, image } = req.body;
+app.post('/blog', upload.single('image'), async (req, res) => {
+  const { title, subtitle, link } = req.body;
+  const imageFile = req.file;
       if (!title) {
         return res.status(401).json({ message: 'Blog post title is required!' });
       }
@@ -73,7 +74,7 @@ client.db("admin").command({ ping: 1 });
       if (!link) {
         return res.status(401).json({ message: 'Blog post link is required!' });
       }
-      if (!image) {
+      if (!imageFile) {
         return res.status(401).json({ message: 'Blog post image is required!' });
       }
 
@@ -92,7 +93,10 @@ client.db("admin").command({ ping: 1 });
         title,
         subtitle,
         link,
-        image,
+        image: {
+          data: imageFile.buffer, // Buffer containing the image data
+          contentType: imageFile.mimetype // MIME type of the image
+        }
       };
 
       const result = await blogs.insertOne(blogPost);
@@ -122,9 +126,10 @@ client.db("admin").command({ ping: 1 });
     });
 
     // PUT API endpoint for updating a single blog post by ID
-    app.put('/blog/:id', async (req, res) => {
+    app.put('/blog/:id', upload.single('image'), async (req, res) => {
       const blogId = req.params.id;
-      const { title, subtitle, link, image } = req.body;
+      const { title, subtitle, link } = req.body;
+      const imageFile = req.file;
 
       if (!title) {
         return res.status(401).json({ message: 'Blog post title is required!' });
@@ -135,7 +140,7 @@ client.db("admin").command({ ping: 1 });
       if (!link) {
         return res.status(401).json({ message: 'Blog post link is required!' });
       }
-      if (!image) {
+      if (!imageFile) {
         return res.status(401).json({ message: 'Blog post image is required!' });
       }
       try {
@@ -150,9 +155,17 @@ client.db("admin").command({ ping: 1 });
         if (!tokenExists) {
             return res.status(401).json({ message: 'You are not authorization to Update.' });
         }
+        let updateFields = { title, subtitle, link };
+        if (imageFile) {
+          // If a new image is uploaded, update the 'image' field
+          updateFields.image = {
+            data: imageFile.buffer, // Buffer containing the image data
+            contentType: imageFile.mimetype // MIME type of the image
+          };
+        }
         const updatedBlog = await blogs.findOneAndUpdate(
           { _id: ObjectId(blogId) },
-          { $set: { title, subtitle, link, image } },
+          { $set: updateFields },
           { returnOriginal: false } // To return the updated document
         );
         if (!updatedBlog.value) {
@@ -251,22 +264,26 @@ client.db("admin").command({ ping: 1 });
     });
 
     // PUT API endpoint to update a project by _id
-    app.put('/projects/:id', async (req, res) => {
+    app.put('/projects/:id', upload.single('image'), async (req, res) => {
       const projectId = req.params.id;
-      const { title, link, image } = req.body;
+      const { title, link } = req.body;
+      const imageFile = req.file; 
       if (!title) {
         return res.status(401).json({ message: 'Projects title is required!' });
       }
       if (!link) {
         return res.status(401).json({ message: 'Projects link is required!' });
       }
-      if (!image) {
+      if (!imageFile) {
         return res.status(401).json({ message: 'Projects image is required!' });
       }
-      const updatedFields = {
-        title,
-        link,
-        image
+      let updatedFields = { title, link };
+      if (imageFile) {
+        // If a new image is uploaded, update the 'image' field
+        updatedFields.image = {
+          data: imageFile.buffer, // Buffer containing the image data
+          contentType: imageFile.mimetype // MIME type of the image
+        };
       }
       try {
             const uuid = parseInt(req.headers.uuid);
