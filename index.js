@@ -112,9 +112,9 @@ app.post('/blog', upload.single('image'), async (req, res) => {
 
     // GET API endpoint for retrieving a single blog post by ID
     app.get('/blog/:id', async (req, res) => {
-      const blogId = req.params.id;
+      const {id} = req.params;
       try {
-        const blog = await blogs.findOne({ _id: ObjectId(blogId) });
+        const blog = await blogs.findOne({ _id: new ObjectId(id) });
         if (!blog) {
           return res.status(404).json({ message: 'Blog post not found' });
         }
@@ -127,7 +127,7 @@ app.post('/blog', upload.single('image'), async (req, res) => {
 
     // PUT API endpoint for updating a single blog post by ID
     app.put('/blog/:id', upload.single('image'), async (req, res) => {
-      const blogId = req.params.id;
+      const {id} = req.params;
       const { title, subtitle, link } = req.body;
       const imageFile = req.file;
 
@@ -164,14 +164,14 @@ app.post('/blog', upload.single('image'), async (req, res) => {
           };
         }
         const updatedBlog = await blogs.findOneAndUpdate(
-          { _id: ObjectId(blogId) },
+          { _id: new ObjectId(id) },
           { $set: updateFields },
           { returnOriginal: false } // To return the updated document
         );
-        if (!updatedBlog.value) {
+        if (!updatedBlog) {
           return res.status(404).json({ message: 'Blog post not found' });
         }
-        res.status(200).json(updatedBlog.value);
+        res.status(200).json(updatedBlog);
       } catch (err) {
         console.error('Error updating blog post:', err);
         res.status(500).json({ message: 'Internal server error' });
@@ -180,7 +180,7 @@ app.post('/blog', upload.single('image'), async (req, res) => {
 
         // DELETE API endpoint for deleting a single blog post by ID
     app.delete('/blog/:id', async (req, res) => {
-      const blogId = req.params.id;
+      const {id} = req.params;
       try {
             const uuid = parseInt(req.headers.uuid);
             const token = req.headers.token;
@@ -193,8 +193,8 @@ app.post('/blog', upload.single('image'), async (req, res) => {
                 return res.status(401).json({ message: 'You are not authorization to delete.' });
             }
         // Find the blog post using its ID and delete it
-        const deletedBlog = await blogs.findOneAndDelete({ _id: ObjectId(blogId) });
-        if (!deletedBlog.value) {
+        const deletedBlog = await blogs.findOneAndDelete({ _id: new ObjectId(id) });
+        if (!deletedBlog) {
           return res.status(404).json({ message: 'Blog post not found' });
         }
         res.status(200).json({ message: 'Blog post deleted successfully' });
@@ -250,9 +250,9 @@ app.post('/blog', upload.single('image'), async (req, res) => {
 
     // GET API endpoint to get a single project by _id
     app.get('/projects/:id', async (req, res) => {
-      const projectId = req.params.id;
+      const {id} = req.params;
       try {
-        const project = await projects.findOne({ _id: ObjectId(projectId) });
+        const project = await projects.findOne({ _id: new ObjectId(id) });
         if (!project) {
           return res.status(404).json({ message: 'Project not found' });
         }
@@ -265,7 +265,7 @@ app.post('/blog', upload.single('image'), async (req, res) => {
 
     // PUT API endpoint to update a project by _id
     app.put('/projects/:id', upload.single('image'), async (req, res) => {
-      const projectId = req.params.id;
+      const {id} = req.params;
       const { title, link } = req.body;
       const imageFile = req.file; 
       if (!title) {
@@ -297,14 +297,14 @@ app.post('/blog', upload.single('image'), async (req, res) => {
                 return res.status(401).json({ message: 'You are not authorization to update.' });
             }
         const updatedProject = await projects.findOneAndUpdate(
-          { _id: ObjectId(projectId) },
+          { _id: new ObjectId(id) },
           { $set: updatedFields },
           { returnOriginal: false }
         );
-        if (!updatedProject.value) {
+        if (!updatedProject) {
           return res.status(404).json({ message: 'Project not found' });
         }
-        res.status(200).json(updatedProject.value);
+        res.status(200).json(updatedProject);
       } catch (err) {
         console.error('Error updating project:', err);
         res.status(500).json({ message: 'Internal server error' });
@@ -313,7 +313,7 @@ app.post('/blog', upload.single('image'), async (req, res) => {
 
     // DELETE API endpoint to delete a project by _id
     app.delete('/projects/:id', async (req, res) => {
-      const projectId = req.params.id; 
+      const {id} = req.params;
       try {
         const uuid = parseInt(req.headers.uuid);
         const token = req.headers.token;
@@ -325,8 +325,8 @@ app.post('/blog', upload.single('image'), async (req, res) => {
         if (!tokenExists) {
           return res.status(401).json({ message: 'You are not authorized to delete.' });
         }
-        const deletedProject = await projects.findOneAndDelete({ _id: ObjectId(projectId) });
-        if (!deletedProject.value) {
+        const deletedProject = await projects.findOneAndDelete({ _id: new ObjectId(id) });
+        if (!deletedProject) {
           return res.status(404).json({ message: 'Project not found' });
         }
         res.status(200).json({ message: 'Project deleted successfully' });
