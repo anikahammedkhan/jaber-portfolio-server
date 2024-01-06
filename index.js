@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
@@ -11,6 +12,8 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Database connection
 // Database connection
@@ -190,14 +193,15 @@ client.db("admin").command({ ping: 1 });
 
 
     app.post('/projects', async (req, res) => {
-      const { title, link, image } = req.body;
+      const { title, link } = req.body;
+      const imageFile = req.file;
       if (!title) {
         return res.status(401).json({ message: 'Projects title is required!' });
       }
       if (!link) {
         return res.status(401).json({ message: 'Projects link is required!' });
       }
-      if (!image) {
+      if (!imageFile) {
         return res.status(401).json({ message: 'Projects image is required!' });
       }
 
@@ -215,7 +219,10 @@ client.db("admin").command({ ping: 1 });
       const projectsPost = {
         title,
         link,
-        image,
+        image: {
+          data: imageFile.buffer,
+          contentType: imageFile.mimetype
+        }
       };
 
       const result = await projects.insertOne(projectsPost);
