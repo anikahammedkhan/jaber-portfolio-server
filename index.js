@@ -193,7 +193,8 @@ client.db("admin").command({ ping: 1 });
 
 
     app.post('/projects', async (req, res) => {
-      const { title, link, imageFile } = req.body;
+      const { title, link } = req.body;
+      const imageFile = req.file;
       if (!title) {
         return res.status(401).json({ message: 'Projects title is required!' });
       }
