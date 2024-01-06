@@ -192,7 +192,7 @@ client.db("admin").command({ ping: 1 });
     });
 
 
-    app.post('/projects', async (req, res) => {
+    app.post('/projects',upload.single('image'), async (req, res) => {
       const { title, link } = req.body;
       const imageFile = req.file;
       if (!title) {
