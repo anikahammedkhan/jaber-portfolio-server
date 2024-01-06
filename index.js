@@ -313,7 +313,7 @@ app.post('/blog', upload.single('image'), async (req, res) => {
 
     // DELETE API endpoint to delete a project by _id
     app.delete('/projects/:id', async (req, res) => {
-      const projectId = req.body.id;
+      const {id} = req.body;
       try {
             const uuid = parseInt(req.headers.uuid);
             const token = req.headers.token;
@@ -325,7 +325,7 @@ app.post('/blog', upload.single('image'), async (req, res) => {
             if (!tokenExists) {
                 return res.status(401).json({ message: 'You are not authorization to delete.' });
             }
-        const deletedProject = await projects.findOneAndDelete({ _id: ObjectId(projectId) });
+        const deletedProject = await projects.findOneAndDelete({ _id: ObjectId(id) });
         if (!deletedProject.value) {
           return res.status(404).json({ message: 'Project not found' });
         }
