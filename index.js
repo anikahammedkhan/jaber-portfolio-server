@@ -312,20 +312,20 @@ app.post('/blog', upload.single('image'), async (req, res) => {
     });
 
     // DELETE API endpoint to delete a project by _id
-    app.delete('/projects/', async (req, res) => {
-      const {id} = req.body;
+    app.delete('/projects/:id', async (req, res) => {
+      const projectId = req.params.id; 
       try {
-            const uuid = parseInt(req.headers.uuid);
-            const token = req.headers.token;
-            if (!token || !uuid) {
-                return res.status(401).json({ message: 'You are not authorization to delete.' });
-            }
-            const tokenExists = await tokenCollection.findOne({ token,uuid });
-            //   console.log(tokenExists, typeof(uuid))
-            if (!tokenExists) {
-                return res.status(401).json({ message: 'You are not authorization to delete.' });
-            }
-        const deletedProject = await projects.findOneAndDelete({ _id: ObjectId(id) });
+        const uuid = parseInt(req.headers.uuid);
+        const token = req.headers.token;
+        
+        if (!token || !uuid) {
+          return res.status(401).json({ message: 'You are not authorized to delete.' });
+        }
+        const tokenExists = await tokenCollection.findOne({ token, uuid });
+        if (!tokenExists) {
+          return res.status(401).json({ message: 'You are not authorized to delete.' });
+        }
+        const deletedProject = await projects.findOneAndDelete({ _id: ObjectId(projectId) });
         if (!deletedProject.value) {
           return res.status(404).json({ message: 'Project not found' });
         }
@@ -335,8 +335,6 @@ app.post('/blog', upload.single('image'), async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
       }
     });
-
-
     app.get('/', async (req, res) => {
         res.send('Jaber Portfolio Server is running');
     });
