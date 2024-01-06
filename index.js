@@ -312,7 +312,7 @@ app.post('/blog', upload.single('image'), async (req, res) => {
     });
 
     // DELETE API endpoint to delete a project by _id
-    app.delete('/projects/:id', async (req, res) => {
+    app.delete('/projects/', async (req, res) => {
       const {id} = req.body;
       try {
             const uuid = parseInt(req.headers.uuid);
